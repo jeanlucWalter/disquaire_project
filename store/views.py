@@ -1,28 +1,22 @@
-from django.http import HttpResponse
-from django.template import loader
+from django.shortcuts import render, get_object_or_404
 from .models import Album
 
-message = "Salut tout le monde !"
-
 def index(request):
-  template = loader.get_template('store/index.html')
-  return HttpResponse(template.render(request=request))
-  # albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
-  # formattedAlbums = ["<li>{}</li>".format(album.title) for album in albums]
-  # message = """<ul>{}</ul>""".format("\n".join(formattedAlbums))
-  # return HttpResponse(message)
+  albums = Album.objects.filter(available=True).order_by('-created_at')[:3]
+  context = {'albums':albums}
+  return render(request, 'store/index.html', context)
 
 def listing(request):
   albums = Album.objects.filter(available=True)
-  formattedAlbums = ["<li>{}</li>".format(album.title) for album in albums]
-  message = """<ul>{}</ul>""".format("\n".join(formattedAlbums))
-  return HttpResponse(message)
+  context = {'albums':albums}
+  return render(request, 'store/listing.html', context)
 
 def detail(request, albumId):
-  album = Album.objects.get(pk=albumId)
-  artists = ", ".join([artist.name for artist in album.artists.all()])
-  message = "Pour l'id {}, le nom de l'album est {}. Il a été écrit par {}".format(albumId, album.title, artists)
-  return HttpResponse(message)
+  album = get_object_or_404(Album, pk=albumId)
+  artists = [artist.name for artist in album.artists.all()]
+  artistsName = ", ".join(artists)
+  context = {'album_title': album.title, 'artists_name': artistsName, 'album_id':albumId, 'thumbnail':album.picture}
+  return render(request, 'store/detail.html', context)
 
 def search(request):
   query = request.GET.get('query')
@@ -32,13 +26,10 @@ def search(request):
     albums = Album.objects.filter(title__icontains = query)
   if not albums.exists():
     albums = Album.objects.filter(artists__name__icontains = query)
-  if not albums.exists():
-    message = "Misère de misère, nous n'avons rien trouvé"
-  else:
-    albums = ["<li>{}</li>".format(album.title) for album in albums]
-    message = """
-        Nous avons trouvé les albums correspondant à votre requête ! Les voici :
-        <ul>{}</ul>
-    """.format("\n".join(albums))
-  return HttpResponse(message)
+  title = "Résultats pour la requête %s"%query
+  context = {
+    'albums': albums,
+    'title': title
+  }
+  return render(request, 'store/search.html', context)
 
