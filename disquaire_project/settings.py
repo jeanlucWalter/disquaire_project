@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
@@ -84,6 +85,7 @@ DATABASES = {
         'PASSWORD': 'Heptadecagone17',
         'HOST': 'localhost',
         'PORT': '5432',
+        'ATOMIC_REQUESTS': True
     }
 }
 

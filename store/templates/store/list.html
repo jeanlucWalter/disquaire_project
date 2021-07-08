@@ -5,6 +5,8 @@
   <hr class="detail-separator">
 </div>
 
+{% include 'store/search_form.html' %}
+
 {% if albums|length_is:"0" %}
     <div class="text-center">
       Palsambleu ! Nous n'avons trouvé aucun résultat à cette requête. Même pas de quoi se ronger la chique !
@@ -24,6 +26,19 @@
     </div>
     {% if forloop.counter|divisibleby:3 %}<div class="clearfix"></div>{% endif %}
   {% endfor %}
-  <div class="clearfix"></div>
+  {% if paginate %}
+    <div class="clearfix"></div>
+
+    <nav aria-label="...">
+      <ul class="pager">
+        {% if albums.has_previous %}
+            <li><a href="?page={{ albums.previous_page_number }}">Précédent</a></li>
+        {% endif %}
+        {% if albums.has_next %}
+            <li><a href="?page={{ albums.next_page_number }}">Suivant</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
 
 {% endif %}
